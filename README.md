@@ -76,3 +76,7 @@ Each prints `all passed` (exit code 0) or each failure (exit code 1).
 2. Add `#Include <name>.ahk` to that folder's `_index.ahk`.
 3. Describe its hotkeys with `Cheatsheet.Add(...)` so they show in the panel.
 4. New apps go in `config/apps.ahk`.
+
+## License
+
+[MIT](LICENSE)
