@@ -22,7 +22,7 @@ Starting with Windows and reloading pass `--quiet`, so the panel stays closed. M
 |---|---|
 | `Keystone.ahk` | Entry point. Includes the library, config and module indexes. |
 | `config/apps.ahk` | App catalog: launch target and window title per app. |
-| `lib/` | Shared code: `App` (Run, IsActive, Toggle), `Text` (selection and paste), `Web` (open or search), `Sound`, `DarkMenus`, `Startup`, `Cheatsheet`, `Keystone` (pause, reload, tray). |
+| `lib/` | Shared code: `App` (Run, IsActive, Toggle), `Text` (selection and paste), `Web` (open or search), `Sound`, `DarkMenus`, `StartMenu`, `Startup`, `Cheatsheet`, `Keystone` (pause, reload, tray). |
 | `ui/` | The control panel. |
 | `modules/global/` | Hotkeys active everywhere. Register each file in `_index.ahk`. |
 | `modules/apps/` | Hotkeys active only in one app, wrapped in `#HotIf Apps.<Name>.IsActive()`. |
@@ -36,10 +36,11 @@ CapsLock is a modifier and no longer toggles caps.
 | `CapsLock` + `n` `a` `e` `i` `o` `u` | ñ á é í ó ú (add `Shift` for uppercase) |
 | `CapsLock` + `/` | ¿ |
 | `CapsLock` + `t` `w` `f` `s` | Toggle Terminal, browser (Zen), Explorer, Spotify |
+| `CapsLock` + `d` `c` `m` `g` | Toggle Discord, Docker Desktop, Obsidian, Steam |
 | `CapsLock` + `↑` `↓` `←` `→` | Selected text to UPPERCASE, lowercase, Sentence case, Title Case |
 | `Alt` + `G` | Open the selected text if it is a URL, otherwise search it on DuckDuckGo |
-| `Win` + mouse wheel | Volume up / down |
-| `Win` + middle click | Mute / unmute |
+| `CapsLock` + mouse wheel | Volume up / down |
+| `CapsLock` + middle click | Mute / unmute |
 | `Win` + `PrintScreen` | Snipping Tool capture (instead of saving a full screenshot) |
 | `Win` + `Space` | Disabled, so it no longer switches input language |
 | `CapsLock` + `F5` | Reload Keystone (plays a ding) |
@@ -75,6 +76,7 @@ Each prints `all passed` (exit code 0) or each failure (exit code 1).
 1. Create `modules/global/<name>.ahk` or `modules/apps/<name>.ahk`.
 2. Add `#Include <name>.ahk` to that folder's `_index.ahk`.
 3. Describe its hotkeys with `Cheatsheet.Add(...)` so they show in the panel.
+   Hotkeys that combine `Win` with the mouse must call `KeepStartMenuClosed()`, or releasing `Win` opens the Start menu.
 4. New apps go in `config/apps.ahk`.
 
 ## License

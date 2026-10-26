@@ -6,6 +6,7 @@
 #Include lib\Web.ahk
 #Include lib\Sound.ahk
 #Include lib\DarkMenus.ahk
+#Include lib\StartMenu.ahk
 #Include lib\Startup.ahk
 #Include lib\Cheatsheet.ahk
 #Include lib\Keystone.ahk
