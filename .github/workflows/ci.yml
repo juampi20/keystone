@@ -1,0 +1,32 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  test:
+    runs-on: windows-latest
+    env:
+      AHK_VERSION: 2.0.19
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install AutoHotkey
+        run: |
+          Invoke-WebRequest "https://github.com/AutoHotkey/AutoHotkey/releases/download/v$env:AHK_VERSION/AutoHotkey_$env:AHK_VERSION.zip" -OutFile ahk.zip
+          Expand-Archive ahk.zip "$env:RUNNER_TEMP\ahk"
+          "$env:RUNNER_TEMP\ahk" | Out-File $env:GITHUB_PATH -Append
+
+      - name: Run tests
+        run: |
+          $failed = 0
+          foreach ($t in Get-ChildItem tests -Filter *.test.ahk) {
+            Write-Host "::group::$($t.Name)"
+            # Piping makes PowerShell wait for the GUI-subsystem exe and capture its stdout.
+            AutoHotkey64.exe /ErrorStdOut $t.FullName | Out-Host
+            if ($LASTEXITCODE -ne 0) { $failed++; Write-Host "::error::$($t.Name) failed" }
+            Write-Host "::endgroup::"
+          }
+          exit $failed
