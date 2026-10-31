@@ -12,7 +12,7 @@ Close any other AutoHotkey script that uses CapsLock first; two scripts hooking 
 
 ## Control panel
 
-Opens when you run `Keystone.ahk` by hand or double-click the tray icon. It shows whether hotkeys are active, lists every hotkey, and has Pause / Resume, Reload, Open folder and Start with Windows. `Esc` hides it.
+Opens when you run `Keystone.ahk` by hand or double-click the tray icon. It shows whether hotkeys are active, lists every hotkey, and has Pause / Resume, Reload, Open folder, Start with Windows, and the left click debounce switch with its window in milliseconds. `Esc` hides it.
 
 Starting with Windows and reloading pass `--quiet`, so the panel stays closed. Modules describe their hotkeys with `Cheatsheet.Add(section, keys, action)`.
 
@@ -22,7 +22,7 @@ Starting with Windows and reloading pass `--quiet`, so the panel stays closed. M
 |---|---|
 | `Keystone.ahk` | Entry point. Includes the library, config and module indexes. |
 | `config/apps.ahk` | App catalog: launch target and window title per app. |
-| `lib/` | Shared code: `App` (Run, IsActive, Toggle), `Text` (selection and paste), `Web` (open or search), `Sound`, `DarkMenus`, `StartMenu`, `Startup`, `Cheatsheet`, `Keystone` (pause, reload, tray). |
+| `lib/` | Shared code: `App` (Run, IsActive, Toggle), `Text` (selection and paste), `Web` (open or search), `Sound`, `DarkMenus`, `StartMenu`, `Startup`, `Cheatsheet`, `ClickDebounce` (the bounce rule), `MouseDebounce` (the mouse hook), `Keystone` (pause, reload, tray). |
 | `ui/` | The control panel. |
 | `modules/global/` | Hotkeys active everywhere. Register each file in `_index.ahk`. |
 | `modules/apps/` | Hotkeys active only in one app, wrapped in `#HotIf Apps.<Name>.IsActive()`. |
@@ -50,6 +50,12 @@ Sounds come from `C:\Windows\Media`, so the repo ships no audio files. Tray and 
 
 `Toggle` hides the app if it is focused, focuses it if it is open, and launches it otherwise.
 
+### Left click debounce
+
+A worn switch can report two clicks for one press. Keystone drops the duplicate left clicks that land within the window (50 ms by default) along with their release, so an app that counts clicks on mouse-up does not see the bounce either. Clicks are never re-sent, with one exception: the release of a hold longer than 150 ms waits one window. If the button comes back down in that time it was lost contact, not a release, and the drag continues; otherwise Keystone sends the left up itself, so letting go lags by the window. Turning the switch off in the panel leaves the mouse untouched.
+
+Windows without a title bar that cover a monitor (games) are skipped, and pausing Keystone turns the debounce off too. The value lives in `Keystone.ini`, next to the script.
+
 ### The Outlast Trials
 
 | Keys | Action |
@@ -67,6 +73,7 @@ An arch with a gold keystone; it turns grey while hotkeys are paused. The icons 
 ```
 "C:\Program Files\AutoHotkey\v2\AutoHotkey64.exe" /ErrorStdOut tests\text.test.ahk
 "C:\Program Files\AutoHotkey\v2\AutoHotkey64.exe" /ErrorStdOut tests\web.test.ahk
+"C:\Program Files\AutoHotkey\v2\AutoHotkey64.exe" /ErrorStdOut tests\mouse-debounce.test.ahk
 ```
 
 Each prints `all passed` (exit code 0) or each failure (exit code 1).

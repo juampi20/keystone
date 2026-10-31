@@ -9,6 +9,8 @@
 #Include lib\StartMenu.ahk
 #Include lib\Startup.ahk
 #Include lib\Cheatsheet.ahk
+#Include lib\ClickDebounce.ahk
+#Include lib\MouseDebounce.ahk
 #Include lib\Keystone.ahk
 #Include config\apps.ahk
 #Include ui\Panel.ahk

@@ -30,6 +30,12 @@ class Panel {
 		Panel.startup := g.AddCheckbox("xm", "Start with Windows")
 		Panel.startup.OnEvent("Click", (box, *) => box.Value ? Startup.Enable() : Startup.Disable())
 
+		Panel.debounce := g.AddCheckbox("xm", "Debounce left click")
+		Panel.debounce.OnEvent("Click", (box, *) => MouseDebounce.SetEnabled(box.Value))
+		Panel.debounceMs := g.AddEdit("x+8 w50 Number Limit3")
+		Panel.debounceMs.OnEvent("Change", (edit, *) => MouseDebounce.SetMs(edit.Value))
+		g.AddText("x+8", "ms")
+
 		g.OnEvent("Escape", (g) => g.Hide())
 		Keystone.OnChange.Push(() => Panel.Refresh())
 		Panel.gui := g
@@ -39,5 +45,7 @@ class Panel {
 		Panel.status.Value := A_IsSuspended ? "Paused: hotkeys are off." : "Active: hotkeys are on."
 		Panel.pauseButton.Text := A_IsSuspended ? "Resume" : "Pause"
 		Panel.startup.Value := Startup.IsEnabled()
+		Panel.debounce.Value := MouseDebounce.enabled
+		Panel.debounceMs.Value := MouseDebounce.ms
 	}
 }
