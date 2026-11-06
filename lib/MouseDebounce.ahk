@@ -1,9 +1,9 @@
 #Requires AutoHotkey v2.0
 
 ; Watches left clicks with a low level hook and drops the bounce of a worn
-; switch. Clicks reach the app exactly as the mouse sent them. The one exception
-; is the release of a long hold: it waits the window out, and is sent again as a
-; left up if the switch stayed open, so lost contact mid-drag doesn't end the drag.
+; switch. Downs reach the app as the mouse sent them. Every release waits the
+; window out and is sent again as a left up if the switch stayed open, so a bounce
+; never ends a hold or a drag.
 class MouseDebounce {
 	static INI := A_ScriptDir "\Keystone.ini"
 	static SECTION := "MouseDebounce"
@@ -13,9 +13,6 @@ class MouseDebounce {
 	static LLMHF_INJECTED := 1
 	static MOUSEEVENTF_LEFTUP := 0x0004
 	static WH_MOUSE_LL := 14
-	static WS_CAPTION := 0x00C00000
-	static GWL_STYLE := -16
-	static MONITOR_DEFAULTTONEAREST := 2
 
 	static enabled := false
 	static ms := 50
@@ -52,8 +49,7 @@ class MouseDebounce {
 	}
 
 	; Runs on every mouse event, so it only does a few reads and never throws.
-	; Windows silently removes a slow low level hook, so mouse moves leave before
-	; the fullscreen check.
+	; Windows silently removes a slow low level hook, so mouse moves leave first.
 	static HookProc(nCode, wParam, lParam) {
 		if nCode < 0
 			return DllCall("CallNextHookEx", "Ptr", 0, "Int", nCode, "UInt", wParam, "Ptr", lParam)
@@ -62,7 +58,7 @@ class MouseDebounce {
 		isDown := wParam = MouseDebounce.WM_LBUTTONDOWN
 		if (isDown || wParam = MouseDebounce.WM_LBUTTONUP)
 			&& !(NumGet(lParam, 12, "UInt") & MouseDebounce.LLMHF_INJECTED)
-			&& MouseDebounce.enabled && !A_IsSuspended && !MouseDebounce.IsFullscreen() {
+			&& MouseDebounce.enabled && !A_IsSuspended {
 			if isDown {
 				pass := MouseDebounce.rule.Down(A_TickCount)
 				SetTimer(MouseDebounce.releaseTimer, 0)
@@ -75,32 +71,6 @@ class MouseDebounce {
 			}
 		}
 		return pass ? DllCall("CallNextHookEx", "Ptr", 0, "Int", nCode, "UInt", wParam, "Ptr", lParam) : 1
-	}
-
-	; A game covers a monitor and has no title bar. If this ever guesses wrong,
-	; the panel checkbox or pausing Keystone turns the debounce off.
-	static IsFullscreen() {
-		win := DllCall("GetForegroundWindow", "Ptr")
-		if !win
-			return false
-		if DllCall("GetWindowLongPtr", "Ptr", win, "Int", MouseDebounce.GWL_STYLE, "Ptr") & MouseDebounce.WS_CAPTION
-			return false
-
-		rect := Buffer(16, 0)
-		if !DllCall("GetWindowRect", "Ptr", win, "Ptr", rect)
-			return false
-		x := NumGet(rect, 0, "Int"), y := NumGet(rect, 4, "Int")
-		w := NumGet(rect, 8, "Int") - x, h := NumGet(rect, 12, "Int") - y
-
-		monitor := DllCall("MonitorFromWindow", "Ptr", win, "UInt", MouseDebounce.MONITOR_DEFAULTTONEAREST, "Ptr")
-		info := Buffer(40, 0)
-		NumPut("UInt", 40, info, 0)
-		if !DllCall("GetMonitorInfo", "Ptr", monitor, "Ptr", info)
-			return false
-		left := NumGet(info, 4, "Int"), top := NumGet(info, 8, "Int")
-		right := NumGet(info, 12, "Int"), bottom := NumGet(info, 16, "Int")
-
-		return x <= left && y <= top && x + w >= right && y + h >= bottom
 	}
 
 	; The window passed with the switch still open, so the held up was real.

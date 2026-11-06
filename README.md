@@ -52,9 +52,9 @@ Sounds come from `C:\Windows\Media`, so the repo ships no audio files. Tray and 
 
 ### Left click debounce
 
-A worn switch can report two clicks for one press. Keystone drops the duplicate left clicks that land within the window (50 ms by default) along with their release, so an app that counts clicks on mouse-up does not see the bounce either. Clicks are never re-sent, with one exception: the release of a hold longer than 150 ms waits one window. If the button comes back down in that time it was lost contact, not a release, and the drag continues; otherwise Keystone sends the left up itself, so letting go lags by the window. Turning the switch off in the panel leaves the mouse untouched.
+A worn switch can report two clicks for one press. Keystone drops the duplicate left clicks that land within the window (50 ms by default) along with their release, so an app that counts clicks on mouse-up does not see the bounce either. Downs are never re-sent, but every release waits one window. If the button comes back down in that time it was a bounce, not a release, and the hold or drag continues; otherwise Keystone sends the left up itself, so letting go lags by the window. Turning the switch off in the panel leaves the mouse untouched.
 
-Windows without a title bar that cover a monitor (games) are skipped, and pausing Keystone turns the debounce off too. The value lives in `Keystone.ini`, next to the script.
+It applies in every window, games included, and pausing Keystone turns the debounce off. The value lives in `Keystone.ini`, next to the script.
 
 ### The Outlast Trials
 

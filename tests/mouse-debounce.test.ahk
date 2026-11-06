@@ -14,27 +14,40 @@ Check(name, actual, expected) {
 	}
 }
 
-; One press, one click.
+; One press, one click: the up goes out once the window passes.
 d := ClickDebounce(50)
 Check("press down", d.Down(1000), true)
-Check("press up", d.Up(1030), true)
+Check("press up", d.Up(1030), "hold")
+Check("press release", d.Release(1080), true)
 
 ; A second closure right after the real one, with its own up.
 d := ClickDebounce(50)
 d.Down(1000)
-Check("first up", d.Up(1003), true)
+Check("first up", d.Up(1003), "hold")
 Check("bounce down", d.Down(1005), false)
-Check("bounce up", d.Up(1008), false)
+Check("bounce up", d.Up(1008), "hold")
+Check("bounce release", d.Release(1058), true)
 Check("next real down", d.Down(1300), true)
 
-; The window counts from the last release, so a second click needs a full window
-; after the first one lets go.
+; A bounce right after the press must not end the hold: the app sees one press
+; from the first down to the last up (trace from franzos/mouse-debounce).
+d := ClickDebounce(50)
+Check("trace down", d.Down(0), true)
+Check("trace bounce up", d.Up(60), "hold")
+Check("trace bounce down", d.Down(104), false)
+Check("trace nothing to release", d.Release(110), false)
+Check("trace real up", d.Up(1100), "hold")
+Check("trace release", d.Release(1150), true)
+
+; The window counts from the hardware release, so a second click needs a full
+; window after the first one lets go.
 d := ClickDebounce(50)
 Check("quick 1 down", d.Down(0), true)
-Check("quick 1 up", d.Up(20), true)
+Check("quick 1 up", d.Up(20), "hold")
+Check("quick 1 release", d.Release(60), true)
 Check("quick 2 down", d.Down(69), false)
 Check("quick 2 at the edge", d.Down(70), true)
-Check("quick 2 up", d.Up(100), true)
+Check("quick 2 up", d.Up(100), "hold")
 
 ; A worn switch also bounces on release, long after the press.
 d := ClickDebounce(50)

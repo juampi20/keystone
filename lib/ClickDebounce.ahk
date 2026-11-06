@@ -4,14 +4,12 @@
 ; its own up. The rule takes timestamps instead of reading the clock so it can be
 ; tested without a mouse. True means let the event through, false means drop it.
 class ClickDebounce {
-	; A press held at least this long is a drag, where one lost contact would end it.
-	static HOLD := 150
-
 	; window: ms between two downs that still count as one press.
 	__New(window) {
 		this.window := window
 		this.prevDown := -1
 		this.prevUp := -1
+		this.upAt := -1
 		this.droppedDown := -1
 		this.held := false
 		this.pendingUp := false
@@ -38,10 +36,12 @@ class ClickDebounce {
 	}
 
 	; The up of a dropped down is dropped too, or apps that count on up see two clicks.
-	; After a long hold the up returns "hold": wait window ms, then call Release.
+	; The up of a press returns "hold": wait window ms, then call Release. Sending it
+	; at once would end a hold on a bounce just after the press.
 	Up(now) {
-		if this.held && now - this.prevDown >= ClickDebounce.HOLD {
+		if this.held {
 			this.pendingUp := true
+			this.upAt := now
 			return "hold"
 		}
 		this.held := false
@@ -57,7 +57,7 @@ class ClickDebounce {
 			return false
 		this.pendingUp := false
 		this.held := false
-		this.prevUp := now
+		this.prevUp := this.upAt
 		return true
 	}
 }
