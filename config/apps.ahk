@@ -13,4 +13,5 @@ Apps := {
 	Steam:    App('"C:\Program Files (x86)\Steam\steam.exe"', "Steam ahk_exe steamwebhelper.exe"),
 
 	OutlastTrials: App("steam://rungameid/1304930", "ahk_exe TOTClient-Win64-Shipping.exe"),
+	ProbablyStolen: App('"C:\Games\Probably Stolen\Probably Stolen.exe"', "ahk_exe Probably Stolen.exe"),
 }
