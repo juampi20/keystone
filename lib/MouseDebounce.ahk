@@ -58,7 +58,7 @@ class MouseDebounce {
 		isDown := wParam = MouseDebounce.WM_LBUTTONDOWN
 		if (isDown || wParam = MouseDebounce.WM_LBUTTONUP)
 			&& !(NumGet(lParam, 12, "UInt") & MouseDebounce.LLMHF_INJECTED)
-			&& MouseDebounce.enabled && !A_IsSuspended {
+			&& MouseDebounce.enabled && !A_IsSuspended && !MouseDebounce.IsOwnWindow() {
 			if isDown {
 				pass := MouseDebounce.rule.Down(A_TickCount)
 				SetTimer(MouseDebounce.releaseTimer, 0)
@@ -71,6 +71,14 @@ class MouseDebounce {
 			}
 		}
 		return pass ? DllCall("CallNextHookEx", "Ptr", 0, "Int", nCode, "UInt", wParam, "Ptr", lParam) : 1
+	}
+
+	; A held up is re-sent by a timer of this thread, which cannot run while one of
+	; our own windows sits in a modal loop (title bar buttons, menus): the click would
+	; never end. So clicks on our own windows are left alone.
+	static IsOwnWindow() {
+		win := DllCall("GetForegroundWindow", "Ptr")
+		return win && DllCall("GetWindowThreadProcessId", "Ptr", win, "Ptr", 0, "UInt") = DllCall("GetCurrentThreadId", "UInt")
 	}
 
 	; The window passed with the switch still open, so the held up was real.
