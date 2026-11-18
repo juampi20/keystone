@@ -29,10 +29,11 @@ Starting with Windows and reloading pass `--quiet`, so the panel stays closed. M
 
 ## Hotkeys
 
-CapsLock is a modifier and no longer toggles caps.
+CapsLock is a modifier, so a single tap does nothing. Tapping it twice within 400 ms toggles Caps Lock instead, with a sound.
 
 | Keys | Action |
 |---|---|
+| `CapsLock` twice | Toggle Caps Lock (plays a sound) |
 | `CapsLock` + `n` `a` `e` `i` `o` `u` | ñ á é í ó ú (add `Shift` for uppercase) |
 | `CapsLock` + `/` | ¿ |
 | `CapsLock` + `t` `w` `f` `s` | Toggle Terminal, browser (Zen), Explorer, Spotify |

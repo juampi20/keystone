@@ -1,6 +1,7 @@
 #Requires AutoHotkey v2.0
 
 ; Hotkeys active in every window. Add one #Include per module.
+#Include caps-toggle.ahk
 #Include spanish.ahk
 #Include launcher.ahk
 #Include media.ahk

@@ -1,8 +1,5 @@
 #Requires AutoHotkey v2.0
 
-; CapsLock no longer toggles caps; it only works as a modifier.
-SetCapsLockState("AlwaysOff")
-
 SpanishChars := Map(
 	"n", ["ñ", "Ñ"],
 	"a", ["á", "Á"],
